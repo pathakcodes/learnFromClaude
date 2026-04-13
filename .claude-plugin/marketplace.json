@@ -1,0 +1,22 @@
+{
+  "name": "learnFromClaude",
+  "owner": {
+    "name": "Shivam Kumar Pathak",
+    "email": "shivampathak339@gmail.com",
+    "url": "https://github.com/pathakcodes"
+  },
+  "metadata": {
+    "description": "Turn your Claude Code sessions into learning cards you can revisit — with a local dashboard for tags, timeline, search, and session jumpback.",
+    "homepage": "https://github.com/pathakcodes/learnFromClaude"
+  },
+  "plugins": [
+    {
+      "name": "learn-from-claude",
+      "source": "./plugins/learn-from-claude",
+      "description": "Auto-summarize each Claude Code session into flashcards. Browse them at http://127.0.0.1:8765/ — tags, daily timeline, search, likes, and one-click session resume.",
+      "category": "productivity",
+      "homepage": "https://github.com/pathakcodes/learnFromClaude",
+      "keywords": ["learning", "flashcards", "hooks", "dashboard", "sessions"]
+    }
+  ]
+}

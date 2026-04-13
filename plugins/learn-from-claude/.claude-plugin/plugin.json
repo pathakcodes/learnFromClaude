@@ -1,0 +1,12 @@
+{
+  "name": "learn-from-claude",
+  "version": "0.1.0",
+  "description": "Auto-summarize each Claude Code session into learning cards; browse them in a local dashboard with tags, timeline, search, likes, and session resume.",
+  "author": {
+    "name": "Shivam Kumar Pathak",
+    "url": "https://github.com/pathakcodes"
+  },
+  "repository": "https://github.com/pathakcodes/learnFromClaude",
+  "license": "MIT",
+  "keywords": ["learning", "flashcards", "hooks", "dashboard", "sessions", "productivity"]
+}

@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>learnFromClaude</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root {
+    --bg-0:        #0b0d12;
+    --bg-1:        #111520;
+    --bg-2:        #161b28;
+    --bg-3:        #1c2232;
+    --bg-4:        #232b3d;
+    --border:      #262d3e;
+    --border-2:    #323a4e;
+    --text:        #e9ecf5;
+    --text-2:      #a8b0c4;
+    --muted:       #6b7387;
+    --accent:      #f59e0b;
+    --accent-2:    #fbbf24;
+    --accent-soft: rgba(245, 158, 11, 0.12);
+    --accent-glow: rgba(245, 158, 11, 0.35);
+    --like:        #ef4444;
+    --like-soft:   rgba(239, 68, 68, 0.14);
+    --ok:          #22c55e;
+    --radius:      14px;
+    --shadow:      0 20px 40px -20px rgba(0,0,0,.7), 0 2px 6px rgba(0,0,0,.4);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Text",
+                 "Segoe UI", Roboto, sans-serif;
+    font-size: 14px; color: var(--text);
+    background:
+      radial-gradient(1200px 700px at 85% -10%, rgba(245,158,11,.08), transparent 60%),
+      radial-gradient(900px 600px at -10% 110%, rgba(99,102,241,.07), transparent 55%),
+      var(--bg-0);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  header.top {
+    display: flex; align-items: center; gap: 20px;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(22,27,40,.9), rgba(22,27,40,.6));
+    backdrop-filter: blur(10px);
+    z-index: 10;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; letter-spacing: -.01em; }
+  .brand-logo {
+    width: 22px; height: 22px;
+    filter: drop-shadow(0 0 10px var(--accent-glow));
+    flex-shrink: 0;
+  }
+  .brand-logo .card-back  { fill: none; stroke: var(--border-2); stroke-width: 1.6; }
+  .brand-logo .card-front { fill: url(#lfc-grad); }
+  .brand-logo .spark      { fill: var(--accent-2); }
+  .brand-logo .spark-ring { fill: rgba(251,191,36,.35); }
+  .brand-sub { color: var(--muted); font-weight: 400; font-size: 12px; padding-left: 10px; border-left: 1px solid var(--border-2); margin-left: 2px; }
+
+  .search-wrap { flex: 1; max-width: 520px; position: relative; }
+  .search-wrap::before {
+    content: ""; position: absolute; left: 14px; top: 50%;
+    width: 14px; height: 14px; transform: translateY(-50%);
+    background: center/contain no-repeat
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7387' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><path d='M21 21l-4.3-4.3'/></svg>");
+    pointer-events: none;
+  }
+  input.search {
+    width: 100%; background: var(--bg-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 14px 10px 38px; font-size: 13.5px; font-family: inherit;
+    transition: border-color .15s, box-shadow .15s, background .15s;
+  }
+  input.search:focus {
+    outline: none; border-color: var(--accent); background: var(--bg-3);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .kbd-hint {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    font-size: 10px; color: var(--muted);
+    border: 1px solid var(--border-2); border-radius: 4px;
+    padding: 1px 6px; pointer-events: none;
+    font-family: "SF Mono", ui-monospace, monospace;
+  }
+
+  .top-actions { display: flex; align-items: center; gap: 8px; }
+  button, .btn {
+    background: var(--bg-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 9px 14px; font-size: 13px; font-family: inherit;
+    cursor: pointer; transition: all .15s ease;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  button:hover { border-color: var(--border-2); background: var(--bg-3); }
+  button:active { transform: translateY(1px); }
+  button.primary {
+    background: linear-gradient(180deg, var(--accent-2), var(--accent));
+    border-color: transparent; color: #111; font-weight: 600;
+    box-shadow: 0 4px 14px -4px var(--accent-glow);
+  }
+  button.primary:hover { filter: brightness(1.05); }
+  button.ghost { background: transparent; }
+  button.icon-only { width: 38px; height: 38px; padding: 0; justify-content: center; }
+  button.like-btn.liked { border-color: var(--like); color: var(--like); background: var(--like-soft); }
+  button.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+  .heart { display: inline-block; font-size: 15px; line-height: 1; transition: transform .2s cubic-bezier(.2,1.6,.5,1); }
+  .heart.pop { transform: scale(1.35); }
+
+  /* Layout */
+  .layout { flex: 1; display: grid; grid-template-columns: 280px 1fr; min-height: 0; }
+  aside {
+    background: linear-gradient(180deg, var(--bg-1), var(--bg-0));
+    border-right: 1px solid var(--border);
+    padding: 24px 20px 24px 24px; overflow-y: auto; scrollbar-width: thin;
+  }
+  aside h3 {
+    margin: 0 0 10px; font-size: 11px; font-weight: 600;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+  }
+  aside section { margin-bottom: 28px; }
+
+  .tag-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    background: var(--bg-2); border: 1px solid var(--border); color: var(--text-2);
+    border-radius: 999px; padding: 4px 10px; font-size: 12px;
+    cursor: pointer; user-select: none; transition: all .12s ease;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .tag:hover { border-color: var(--accent); color: var(--text); }
+  .tag.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .tag .count { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 11px; }
+  .tag.active .count { color: var(--accent); }
+
+  .timeline { display: flex; flex-direction: column; gap: 2px; }
+  .day {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: 8px; cursor: pointer;
+    font-size: 13px; color: var(--text-2); transition: all .12s;
+    border: 1px solid transparent;
+  }
+  .day:hover { background: var(--bg-2); color: var(--text); }
+  .day.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .day-label { flex: 1; }
+  .day-bar {
+    flex: 0 0 auto; height: 6px; border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    opacity: .55; min-width: 4px;
+  }
+  .day.active .day-bar { opacity: 1; }
+  .day .count { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; min-width: 20px; text-align: right; }
+  .day.active .count { color: var(--accent); }
+
+  /* Main */
+  main { display: flex; flex-direction: column; overflow: hidden; }
+  .main-inner { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 20px 32px 16px; overflow-y: auto; }
+  .filter-bar {
+    width: 100%; max-width: 780px;
+    display: flex; gap: 8px; flex-wrap: wrap;
+    align-items: center; min-height: 28px; margin-bottom: 10px;
+  }
+  .filter-summary { color: var(--muted); font-size: 12px; margin-right: 6px; }
+  .filter-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 6px 3px 10px;
+    background: var(--accent-soft); border: 1px solid var(--accent); color: var(--accent);
+    border-radius: 999px; font-size: 12px;
+  }
+  .filter-chip button {
+    background: transparent; border: none; color: var(--accent);
+    padding: 0; width: 18px; height: 18px; border-radius: 50%;
+    font-size: 14px; line-height: 1; cursor: pointer;
+  }
+  .filter-chip button:hover { background: rgba(245,158,11,.2); }
+  .clear-all {
+    font-size: 12px; color: var(--muted); cursor: pointer;
+    background: none; border: none; padding: 0 4px; text-decoration: underline;
+  }
+  .clear-all:hover { color: var(--text); }
+
+  .stage {
+    flex: 1; width: 100%; max-width: 780px;
+    display: flex; align-items: flex-start; justify-content: center;
+    min-height: 420px;
+  }
+  .stack { position: relative; width: 100%; min-height: 460px; perspective: 1400px; }
+
+  .card {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(800px 300px at 10% -10%, rgba(245,158,11,.09), transparent 60%),
+      linear-gradient(180deg, var(--bg-3), var(--bg-2));
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 28px 30px 20px;
+    display: flex; flex-direction: column; gap: 14px;
+    box-shadow: var(--shadow);
+    transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .3s, border-color .3s;
+    will-change: transform, opacity;
+    user-select: text;
+  }
+  .card.current { z-index: 3; }
+  .card.current:hover { border-color: var(--border-2); }
+  .card.behind-1 { z-index: 2; transform: translateY(12px) scale(.965); opacity: .65; pointer-events: none; }
+  .card.behind-2 { z-index: 1; transform: translateY(24px) scale(.93); opacity: .35; pointer-events: none; }
+  .card.swipe-left  { transform: translateX(-110%) rotate(-5deg); opacity: 0; pointer-events: none; }
+  .card.swipe-right { transform: translateX( 110%) rotate( 5deg); opacity: 0; pointer-events: none; }
+
+  .card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .card-actions { display: flex; gap: 4px; }
+  .card-like {
+    background: transparent; border: none; color: var(--text-2);
+    padding: 6px 10px; border-radius: 999px; font-size: 16px;
+    cursor: pointer; transition: color .15s, background .15s;
+  }
+  .card-like:hover { background: var(--bg-3); color: var(--like); }
+  .card-like.liked { color: var(--like); }
+  .card-delete {
+    background: transparent; border: none; color: var(--muted);
+    padding: 6px; border-radius: 8px; cursor: pointer;
+    font-size: 18px; line-height: 1;
+  }
+  .card-delete:hover { color: var(--like); background: var(--bg-3); }
+
+  .card h2 {
+    margin: 0; font-size: 22px; line-height: 1.25;
+    letter-spacing: -.015em; font-weight: 600;
+  }
+  .card-lesson {
+    font-size: 15.5px; line-height: 1.55; color: var(--text);
+    white-space: pre-wrap;
+    padding-bottom: 12px; border-bottom: 1px dashed var(--border);
+  }
+  .card-details {
+    font-size: 14px; line-height: 1.65; color: var(--text-2);
+    white-space: pre-wrap;
+    overflow-y: auto; scrollbar-width: thin;
+    max-height: 200px;
+  }
+  pre.code {
+    margin: 12px 0 0;
+    background: #06080c; border: 1px solid var(--border);
+    padding: 12px 14px; border-radius: 10px;
+    font-family: "SF Mono", ui-monospace, "JetBrains Mono", monospace;
+    font-size: 12.5px; line-height: 1.55;
+    overflow-x: auto; color: #d8deec;
+  }
+
+  .card-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; padding-top: 10px; border-top: 1px solid var(--border);
+    font-size: 11.5px; color: var(--muted);
+    flex-wrap: wrap;
+  }
+  .session-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg-1); border: 1px solid var(--border);
+    padding: 3px 10px; border-radius: 999px;
+    font-family: "SF Mono", ui-monospace, monospace;
+    font-size: 11px; color: var(--text-2);
+    cursor: pointer; transition: all .15s;
+  }
+  .session-badge:hover { border-color: var(--accent); color: var(--accent); }
+  .session-badge.copied { border-color: var(--ok); color: var(--ok); }
+  .session-badge .label { color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-size: 9.5px; }
+  .session-badge .id { font-variant-numeric: tabular-nums; }
+
+  .controls { margin: 18px 0 8px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+
+  .empty { text-align: center; color: var(--muted); padding: 80px 20px; max-width: 480px; }
+  .empty h2 { color: var(--text); font-weight: 500; margin-bottom: 8px; }
+
+  footer {
+    padding: 10px 24px; font-size: 11.5px; color: var(--muted);
+    border-top: 1px solid var(--border);
+    display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center;
+    background: var(--bg-1);
+  }
+  footer .signature {
+    justify-self: center; text-align: center; white-space: nowrap;
+  }
+  footer .signature a {
+    color: var(--text-2); text-decoration: none;
+    border-bottom: 1px dotted var(--border-2);
+    transition: color .15s, border-color .15s;
+  }
+  footer .signature a:hover { color: var(--accent); border-color: var(--accent); }
+  footer .signature .hl { color: var(--like); display: inline-block; animation: heart-pulse 2.4s ease-in-out infinite; }
+  footer .right { text-align: right; }
+  @keyframes heart-pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.18); }
+  }
+  footer kbd {
+    background: var(--bg-2); border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 4px;
+    font-family: "SF Mono", monospace; font-size: 10.5px; margin: 0 2px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-2); }
+
+  /* --------- Settings modal --------- */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(6,8,12,.72);
+    backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 100;
+    animation: fade .15s ease-out;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    width: min(780px, 92vw); max-height: 86vh;
+    display: flex; flex-direction: column;
+    background: var(--bg-2); border: 1px solid var(--border-2);
+    border-radius: 16px; box-shadow: 0 40px 80px -20px rgba(0,0,0,.8);
+    overflow: hidden;
+    animation: rise .2s cubic-bezier(.2,.8,.2,1);
+  }
+  .modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 22px; border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, var(--bg-3), var(--bg-2));
+  }
+  .modal-head h2 { margin: 0; font-size: 16px; font-weight: 600; }
+  .modal-head .sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .modal-close {
+    background: transparent; border: none; color: var(--muted);
+    font-size: 20px; line-height: 1; cursor: pointer;
+    width: 32px; height: 32px; border-radius: 8px;
+  }
+  .modal-close:hover { background: var(--bg-3); color: var(--text); }
+  .modal-body { padding: 18px 22px; overflow-y: auto; flex: 1; }
+  .modal-hint {
+    font-size: 12.5px; line-height: 1.55; color: var(--text-2);
+    background: var(--bg-1); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 10px 14px; border-radius: 8px; margin-bottom: 14px;
+  }
+  .modal-hint code {
+    background: var(--bg-3); padding: 1px 6px; border-radius: 4px;
+    font-family: "SF Mono", monospace; font-size: 11.5px;
+  }
+  textarea#config-editor {
+    width: 100%; min-height: 420px; resize: vertical;
+    background: #06080c; color: #d8deec;
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px; font-size: 12.5px; line-height: 1.6;
+    font-family: "SF Mono", ui-monospace, monospace;
+    tab-size: 2;
+  }
+  textarea#config-editor:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .modal-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 22px; border-top: 1px solid var(--border);
+    background: var(--bg-1);
+  }
+  .modal-foot .left { color: var(--muted); font-size: 12px; }
+  .modal-foot .right { display: flex; gap: 8px; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--bg-4); border: 1px solid var(--border-2);
+    color: var(--text); padding: 10px 18px; border-radius: 10px;
+    font-size: 13px; box-shadow: var(--shadow);
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s, transform .25s cubic-bezier(.2,.8,.2,1);
+    z-index: 200;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.ok { border-color: var(--ok); }
+  .toast.err { border-color: var(--like); }
+
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    aside { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <svg class="brand-logo" viewBox="0 0 32 32" aria-hidden="true">
+      <defs>
+        <linearGradient id="lfc-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"  stop-color="#fbbf24"/>
+          <stop offset="100%" stop-color="#d97706"/>
+        </linearGradient>
+      </defs>
+      <!-- back card (hint of a stack) -->
+      <rect class="card-back"  x="5"  y="10" width="17" height="14" rx="3"/>
+      <!-- front card -->
+      <rect class="card-front" x="9"  y="6"  width="17" height="14" rx="3"/>
+      <!-- spark of insight -->
+      <circle class="spark-ring" cx="26" cy="6" r="4"/>
+      <circle class="spark"      cx="26" cy="6" r="2"/>
+    </svg>
+    <span>learnFromClaude</span>
+    <span class="brand-sub"><span id="card-total">0</span> cards</span>
+  </div>
+  <div class="search-wrap">
+    <input id="search" class="search" type="search" placeholder="Search title, content, tags…" autocomplete="off" />
+    <span class="kbd-hint">/</span>
+  </div>
+  <div class="top-actions">
+    <button id="liked-toggle" class="like-btn" aria-pressed="false" title="Show only liked (Shift+L)">
+      <span class="heart" id="header-heart">♡</span>
+      <span id="liked-count">0</span>
+    </button>
+    <button id="settings-open" class="icon-only ghost" title="Settings (,)" aria-label="Settings">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside>
+    <section>
+      <h3>Tags</h3>
+      <div id="tag-cloud" class="tag-cloud"></div>
+    </section>
+    <section>
+      <h3>Timeline</h3>
+      <div id="timeline" class="timeline"></div>
+    </section>
+  </aside>
+
+  <main>
+    <div class="main-inner">
+      <div id="active-filters" class="filter-bar"></div>
+
+      <div class="stage">
+        <div id="stack" class="stack"></div>
+      </div>
+
+      <div class="controls" id="controls">
+        <button id="prev" title="Previous (←)">← Prev</button>
+        <button id="like" class="primary like-btn" title="Like (L)">
+          <span class="heart" id="foot-heart">♡</span>
+          <span>Like</span>
+        </button>
+        <button id="next" title="Next (→)">Next →</button>
+        <button id="shuffle" class="ghost" title="Shuffle (S)">Shuffle</button>
+      </div>
+
+      <div id="empty" class="empty" style="display:none">
+        <h2>Nothing here yet</h2>
+        <p id="empty-msg">Use Claude Code for a bit. Insights appear after your session ends.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<footer>
+  <div>
+    <kbd>/</kbd> search · <kbd>←</kbd>/<kbd>→</kbd> nav · <kbd>L</kbd> like ·
+    <kbd>S</kbd> shuffle · <kbd>,</kbd> settings · <kbd>Esc</kbd> close / clear
+  </div>
+  <div class="signature">
+    Made with <span class="hl">♥</span> by
+    <a href="https://github.com/pathakcodes" target="_blank" rel="noopener noreferrer">@pathakcodes</a>
+  </div>
+  <div class="right"><code>~/.claude/learnFromClaude/CONFIG.md</code></div>
+</footer>
+
+<!-- Settings modal -->
+<div id="modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h2 id="modal-title">Extraction settings</h2>
+        <div class="sub" id="modal-path">CONFIG.md</div>
+      </div>
+      <button class="modal-close" id="modal-close" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-hint">
+        This file is injected verbatim into the session-end summarizer's prompt.
+        Edit it in plain English — knobs like <code>cards_per_session: 3-5</code>,
+        categories, tone rules, custom instructions. Changes take effect at the next session end.
+      </div>
+      <textarea id="config-editor" spellcheck="false"></textarea>
+    </div>
+    <div class="modal-foot">
+      <div class="left" id="modal-status">Loaded.</div>
+      <div class="right">
+        <button id="config-reset" class="ghost" title="Restore CONFIG.default.md">Reset to defaults</button>
+        <button id="config-cancel" class="ghost">Cancel</button>
+        <button id="config-save" class="primary">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+// -------- state --------
+const state = {
+  cards: [],
+  filtered: [],
+  idx: 0,
+  search: '',
+  tags: new Set(),
+  day: null,
+  likedOnly: false,
+};
+
+// -------- DOM helpers (safe: no innerHTML) --------
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined && text !== null) n.textContent = String(text);
+  return n;
+}
+function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+
+function toast(msg, kind) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (kind ? ' ' + kind : '');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.className = 'toast', 1800);
+}
+
+// Copy-to-clipboard with Clipboard API + textarea fallback for older contexts.
+async function copyText(text) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (_) {}
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  } catch (_) { return false; }
+}
+
+// -------- dates --------
+function dayKey(iso) {
+  if (!iso) return 'unknown';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return 'unknown';
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function dayLabel(key) {
+  if (key === 'unknown') return 'Unknown';
+  const today = dayKey(new Date().toISOString());
+  const yd = new Date(); yd.setDate(yd.getDate() - 1);
+  const yesterday = dayKey(yd.toISOString());
+  if (key === today) return 'Today';
+  if (key === yesterday) return 'Yesterday';
+  const [y, m, d] = key.split('-');
+  return new Date(+y, +m - 1, +d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+// -------- data --------
+async function load() {
+  try {
+    const res = await fetch('/flashcards.json?t=' + Date.now());
+    const data = await res.json();
+    state.cards = Array.isArray(data) ? data : [];
+    state.cards.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+    recompute({ preserveIdx: true });
+  } catch (e) { console.error('load failed', e); }
+}
+
+async function toggleLike(cardId) {
+  try {
+    const res = await fetch('/api/toggle-like', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: cardId }),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const card = state.cards.find(c => c.id === cardId);
+    if (card && data.card) Object.assign(card, data.card);
+    recompute({ preserveIdx: true });
+  } catch (e) { console.error('like failed', e); }
+}
+
+async function deleteCard(cardId) {
+  if (!confirm('Delete this card?')) return;
+  try {
+    const res = await fetch('/api/delete', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: cardId }),
+    });
+    if (!res.ok) return;
+    state.cards = state.cards.filter(c => c.id !== cardId);
+    recompute();
+    toast('Card deleted');
+  } catch (e) { console.error('delete failed', e); }
+}
+
+// -------- filter --------
+function matchesFilter(c) {
+  if (state.likedOnly && !c.liked) return false;
+  if (state.day && dayKey(c.created_at) !== state.day) return false;
+  if (state.tags.size) {
+    const cardTags = new Set((c.tags || []).map(t => t.toLowerCase()));
+    for (const t of state.tags) if (!cardTags.has(t.toLowerCase())) return false;
+  }
+  if (state.search) {
+    const q = state.search.toLowerCase();
+    const hay = [c.title, c.front, c.back, c.example, (c.tags || []).join(' ')]
+      .filter(Boolean).join(' ').toLowerCase();
+    if (!hay.includes(q)) return false;
+  }
+  return true;
+}
+function recompute({ preserveIdx = false } = {}) {
+  const previousId = state.filtered[state.idx]?.id;
+  state.filtered = state.cards.filter(matchesFilter);
+  state.idx = preserveIdx && previousId
+    ? Math.max(0, state.filtered.findIndex(c => c.id === previousId))
+    : 0;
+  renderAll();
+}
+
+// -------- sidebar --------
+function tagCounts(cards) {
+  const m = new Map();
+  for (const c of cards) for (const t of (c.tags || [])) {
+    const k = t.toLowerCase(); m.set(k, (m.get(k) || 0) + 1);
+  }
+  return [...m.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+}
+function renderTagCloud() {
+  const root = document.getElementById('tag-cloud');
+  clear(root);
+  const counts = tagCounts(state.cards);
+  if (!counts.length) {
+    const hint = el('div', '', 'No tags yet.');
+    hint.style.color = 'var(--muted)'; hint.style.fontSize = '12px';
+    root.appendChild(hint); return;
+  }
+  for (const [tag, n] of counts) {
+    const pill = el('span', 'tag' + (state.tags.has(tag) ? ' active' : ''));
+    pill.appendChild(el('span', '', '#' + tag));
+    pill.appendChild(el('span', 'count', n));
+    pill.addEventListener('click', () => {
+      if (state.tags.has(tag)) state.tags.delete(tag); else state.tags.add(tag);
+      recompute();
+    });
+    root.appendChild(pill);
+  }
+}
+function renderTimeline() {
+  const root = document.getElementById('timeline');
+  clear(root);
+  const groups = new Map();
+  for (const c of state.cards) {
+    const k = dayKey(c.created_at);
+    groups.set(k, (groups.get(k) || 0) + 1);
+  }
+  if (!groups.size) return;
+  const entries = [...groups.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+  const max = Math.max(...entries.map(e => e[1]));
+  for (const [key, n] of entries) {
+    const row = el('div', 'day' + (state.day === key ? ' active' : ''));
+    row.appendChild(el('span', 'day-label', dayLabel(key)));
+    const bar = el('span', 'day-bar');
+    bar.style.width = Math.max(12, Math.round((n / max) * 70)) + 'px';
+    row.appendChild(bar);
+    row.appendChild(el('span', 'count', n));
+    row.addEventListener('click', () => {
+      state.day = state.day === key ? null : key;
+      recompute();
+    });
+    root.appendChild(row);
+  }
+}
+
+// -------- filter bar --------
+function renderFilterBar() {
+  const bar = document.getElementById('active-filters');
+  clear(bar);
+  const total = state.cards.length;
+  const shown = state.filtered.length;
+  const hasFilter = state.search || state.tags.size || state.day || state.likedOnly;
+  bar.appendChild(el('span', 'filter-summary',
+    hasFilter ? `${shown} of ${total} cards` : `${total} card${total === 1 ? '' : 's'}`));
+
+  function chip(label, onRemove) {
+    const c = el('span', 'filter-chip');
+    c.appendChild(el('span', '', label));
+    const x = el('button', '', '×');
+    x.title = 'Remove filter';
+    x.addEventListener('click', onRemove);
+    c.appendChild(x);
+    bar.appendChild(c);
+  }
+  if (state.search) chip(`"${state.search}"`, () => {
+    state.search = ''; document.getElementById('search').value = ''; recompute();
+  });
+  for (const t of state.tags) chip('#' + t, () => { state.tags.delete(t); recompute(); });
+  if (state.day) chip(dayLabel(state.day), () => { state.day = null; recompute(); });
+  if (state.likedOnly) chip('♥ liked', () => { state.likedOnly = false; recompute(); });
+  if (hasFilter) {
+    const b = el('button', 'clear-all', 'clear all');
+    b.addEventListener('click', clearAllFilters);
+    bar.appendChild(b);
+  }
+}
+function clearAllFilters() {
+  state.search = ''; state.tags.clear(); state.day = null; state.likedOnly = false;
+  document.getElementById('search').value = '';
+  recompute();
+}
+
+// -------- header totals --------
+function renderHeader() {
+  document.getElementById('card-total').textContent = state.cards.length;
+  const liked = state.cards.filter(c => c.liked).length;
+  document.getElementById('liked-count').textContent = liked;
+  const hh = document.getElementById('header-heart');
+  hh.textContent = liked > 0 ? '♥' : '♡';
+  hh.style.color = liked > 0 ? 'var(--like)' : '';
+  const btn = document.getElementById('liked-toggle');
+  btn.classList.toggle('liked', state.likedOnly);
+  btn.setAttribute('aria-pressed', state.likedOnly ? 'true' : 'false');
+}
+
+// -------- card --------
+function buildSessionBadge(card) {
+  if (!card.session_id) return null;
+  const wrap = el('span', 'session-badge');
+  wrap.title = 'Copy: claude --resume ' + card.session_id;
+  wrap.appendChild(el('span', 'label', 'session'));
+  // Short-form id: first 8 chars + ellipsis, full id in title
+  const short = card.session_id.length > 12 ? card.session_id.slice(0, 8) + '…' : card.session_id;
+  wrap.appendChild(el('span', 'id', short));
+  const copyIcon = el('span', '', '⎘');
+  copyIcon.style.opacity = '.7';
+  wrap.appendChild(copyIcon);
+  wrap.addEventListener('click', async e => {
+    e.stopPropagation();
+    const ok = await copyText('claude --resume ' + card.session_id);
+    if (ok) {
+      wrap.classList.add('copied');
+      wrap.querySelector('.id').textContent = 'copied';
+      toast('Copied: claude --resume ' + card.session_id, 'ok');
+      setTimeout(() => {
+        wrap.classList.remove('copied');
+        wrap.querySelector('.id').textContent = short;
+      }, 1600);
+    } else {
+      toast('Copy failed', 'err');
+    }
+  });
+  return wrap;
+}
+
+function buildCard(c, offset) {
+  const card = el('div', 'card ' + (offset === 0 ? 'current' : 'behind-' + offset));
+
+  const top = el('div', 'card-top');
+  const tags = el('div', 'card-tags');
+  (c.tags || []).forEach(t => {
+    const pill = el('span', 'tag' + (state.tags.has(t.toLowerCase()) ? ' active' : ''));
+    pill.appendChild(el('span', '', '#' + t));
+    if (offset === 0) {
+      pill.addEventListener('click', e => {
+        e.stopPropagation();
+        const k = t.toLowerCase();
+        if (state.tags.has(k)) state.tags.delete(k); else state.tags.add(k);
+        recompute();
+      });
+    }
+    tags.appendChild(pill);
+  });
+  top.appendChild(tags);
+
+  const actions = el('div', 'card-actions');
+  const like = el('button', 'card-like' + (c.liked ? ' liked' : ''));
+  like.title = c.liked ? 'Unlike' : 'Like';
+  like.appendChild(el('span', 'heart', c.liked ? '♥' : '♡'));
+  if (offset === 0) {
+    like.addEventListener('click', e => {
+      e.stopPropagation();
+      const h = like.querySelector('.heart');
+      h.classList.add('pop'); setTimeout(() => h.classList.remove('pop'), 200);
+      toggleLike(c.id);
+    });
+  }
+  const del = el('button', 'card-delete', '×');
+  del.title = 'Delete card';
+  if (offset === 0) {
+    del.addEventListener('click', e => { e.stopPropagation(); deleteCard(c.id); });
+  }
+  actions.appendChild(like); actions.appendChild(del);
+  top.appendChild(actions);
+  card.appendChild(top);
+
+  card.appendChild(el('h2', '', c.title || 'Untitled'));
+
+  // Lesson (front) — declarative headline, always visible.
+  if (c.front) card.appendChild(el('div', 'card-lesson', c.front));
+
+  // Details (back) — explanation + example, also always visible below.
+  const details = el('div', 'card-details');
+  if (c.back) details.appendChild(el('div', '', c.back));
+  if (c.example) details.appendChild(el('pre', 'code', c.example));
+  if (c.back || c.example) card.appendChild(details);
+
+  const foot = el('div', 'card-foot');
+  const sessionBadge = buildSessionBadge(c);
+  if (sessionBadge) foot.appendChild(sessionBadge);
+  else foot.appendChild(el('span', '', ''));
+  const when = c.created_at ? new Date(c.created_at).toLocaleString() : '';
+  foot.appendChild(el('span', '', when));
+  card.appendChild(foot);
+
+  return card;
+}
+
+function renderStack() {
+  const stack = document.getElementById('stack');
+  const empty = document.getElementById('empty');
+  const emptyMsg = document.getElementById('empty-msg');
+  clear(stack);
+
+  if (!state.filtered.length) {
+    stack.style.display = 'none';
+    empty.style.display = 'block';
+    emptyMsg.textContent = state.cards.length === 0
+      ? 'Use Claude Code for a bit. Insights appear after your session ends.'
+      : 'No cards match the current filters. Try clearing them.';
+    syncFooterLike();
+    return;
+  }
+  stack.style.display = 'block';
+  empty.style.display = 'none';
+
+  for (let offset = 2; offset >= 0; offset--) {
+    const pos = state.idx + offset;
+    if (pos >= state.filtered.length) continue;
+    stack.appendChild(buildCard(state.filtered[pos], offset));
+  }
+  syncFooterLike();
+}
+
+function syncFooterLike() {
+  const current = state.filtered[state.idx];
+  const footHeart = document.getElementById('foot-heart');
+  const likeBtn = document.getElementById('like');
+  likeBtn.classList.toggle('liked', !!(current && current.liked));
+  footHeart.textContent = (current && current.liked) ? '♥' : '♡';
+}
+
+function renderAll() {
+  renderHeader();
+  renderFilterBar();
+  renderTagCloud();
+  renderTimeline();
+  renderStack();
+}
+
+// -------- actions --------
+function next() {
+  const cur = document.querySelector('.card.current');
+  if (cur && state.idx < state.filtered.length - 1) cur.classList.add('swipe-left');
+  setTimeout(() => {
+    state.idx = Math.min(state.idx + 1, state.filtered.length - 1);
+    renderStack();
+  }, 220);
+}
+function prev() {
+  const cur = document.querySelector('.card.current');
+  if (cur && state.idx > 0) cur.classList.add('swipe-right');
+  setTimeout(() => { state.idx = Math.max(state.idx - 1, 0); renderStack(); }, 220);
+}
+function shuffle() {
+  for (let i = state.filtered.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [state.filtered[i], state.filtered[j]] = [state.filtered[j], state.filtered[i]];
+  }
+  state.idx = 0; renderStack();
+}
+function likeCurrent() {
+  const c = state.filtered[state.idx]; if (!c) return;
+  const h = document.getElementById('foot-heart');
+  h.classList.add('pop'); setTimeout(() => h.classList.remove('pop'), 200);
+  toggleLike(c.id);
+}
+
+// -------- settings modal --------
+const modal = document.getElementById('modal');
+const editor = document.getElementById('config-editor');
+const modalStatus = document.getElementById('modal-status');
+const modalPath = document.getElementById('modal-path');
+
+async function openSettings() {
+  try {
+    const res = await fetch('/api/config');
+    const data = await res.json();
+    editor.value = data.content || '';
+    modalPath.textContent = data.path || 'CONFIG.md';
+    modalStatus.textContent = `Loaded · ${editor.value.length.toLocaleString()} bytes`;
+    modal.classList.add('open');
+    setTimeout(() => editor.focus(), 50);
+  } catch (e) {
+    toast('Failed to load settings', 'err');
+  }
+}
+function closeSettings() { modal.classList.remove('open'); }
+
+async function saveSettings() {
+  const content = editor.value;
+  try {
+    const res = await fetch('/api/config', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      toast('Save failed: ' + (err.error || res.status), 'err');
+      return;
+    }
+    const data = await res.json();
+    modalStatus.textContent = `Saved · ${data.bytes} bytes · takes effect next session`;
+    toast('Settings saved', 'ok');
+  } catch (e) { toast('Save failed', 'err'); }
+}
+
+async function resetSettings() {
+  if (!confirm('Reset CONFIG.md to defaults? Your current edits will be lost.')) return;
+  try {
+    const res = await fetch('/api/config/reset', { method: 'POST' });
+    const data = await res.json();
+    if (!res.ok) { toast('Reset failed', 'err'); return; }
+    editor.value = data.content || '';
+    modalStatus.textContent = 'Reset to defaults · ' + editor.value.length + ' bytes';
+    toast('Reset to defaults', 'ok');
+  } catch (e) { toast('Reset failed', 'err'); }
+}
+
+document.getElementById('settings-open').addEventListener('click', openSettings);
+document.getElementById('modal-close').addEventListener('click', closeSettings);
+document.getElementById('config-cancel').addEventListener('click', closeSettings);
+document.getElementById('config-save').addEventListener('click', saveSettings);
+document.getElementById('config-reset').addEventListener('click', resetSettings);
+modal.addEventListener('click', e => { if (e.target === modal) closeSettings(); });
+
+// -------- events --------
+document.getElementById('search').addEventListener('input', e => {
+  state.search = e.target.value.trim(); recompute();
+});
+document.getElementById('liked-toggle').addEventListener('click', () => {
+  state.likedOnly = !state.likedOnly; recompute();
+});
+document.getElementById('next').onclick = next;
+document.getElementById('prev').onclick = prev;
+document.getElementById('like').onclick = likeCurrent;
+document.getElementById('shuffle').onclick = shuffle;
+
+document.addEventListener('keydown', e => {
+  const typing = document.activeElement &&
+    (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
+  const modalOpen = modal.classList.contains('open');
+
+  if (e.key === 'Escape') {
+    if (modalOpen) { closeSettings(); return; }
+    if (typing) { document.activeElement.blur(); return; }
+    clearAllFilters();
+    return;
+  }
+  if (modalOpen) {
+    // Cmd/Ctrl+S to save
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault(); saveSettings();
+    }
+    return;
+  }
+  if (e.key === '/') { if (!typing) { e.preventDefault(); document.getElementById('search').focus(); } return; }
+  if (typing) return;
+  if (e.key === ',')           openSettings();
+  else if (e.key === 'ArrowRight') next();
+  else if (e.key === 'ArrowLeft')  prev();
+  else if (e.key.toLowerCase() === 'l' && e.shiftKey) { state.likedOnly = !state.likedOnly; recompute(); }
+  else if (e.key.toLowerCase() === 'l') likeCurrent();
+  else if (e.key.toLowerCase() === 's') shuffle();
+});
+
+// -------- boot --------
+load();
+setInterval(load, 15000);
+</script>
+</body>
+</html>
