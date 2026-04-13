@@ -2,19 +2,23 @@
 
 > Turn every Claude Code session into a stack of learning cards you can revisit.
 
-![learnFromClaude dashboard](docs/screenshots/01-main.png)
-
-A Claude Code plugin that passively captures your tool use during a session, asks Claude to extract 3–5 genuinely teachable moments at session end, and surfaces them in a local dashboard with tags, a daily timeline, search, likes, and one-click session resume.
-
-You use Claude Code. Claude Code teaches you back.
-
-## Demo
+**For Claude Code users who want their work to compound into knowledge, not just diffs.**
 
 ![walkthrough](docs/video/walkthrough.gif)
 
-[Watch as MP4 (740 KB)](docs/video/walkthrough.mp4)
+A Claude Code plugin that passively captures your tool use during a session, asks Claude to extract 3–5 declarative learning cards at session end, and surfaces them in a local dashboard with tags, a daily timeline, search, likes, and one-click session resume.
 
-## Screenshots
+You use Claude Code. Claude Code teaches you back.
+
+[Watch the walkthrough as HD MP4 (740 KB)](docs/video/walkthrough.mp4) · [Changelog](CHANGELOG.md)
+
+---
+
+## What you'll see
+
+The dashboard lives at `http://127.0.0.1:8765/`. Cards are declarative, not quiz-style — the lesson is on the front, the details below, all visible at once.
+
+![learnFromClaude dashboard](docs/screenshots/01-main.png)
 
 | Filter by tag | Live search |
 |---|---|
