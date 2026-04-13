@@ -15,7 +15,10 @@ ends.
 
 ## Defaults
 
-- **cards_per_session**: 3 to 5
+- **cards_per_session**: up to 5 — but treat this as a CEILING, not a quota.
+  Most sessions should produce 0–2 cards. Returning `[]` is the correct and
+  expected answer for routine work. Never invent or stretch a card just to
+  reach a number.
 - **min_session_events**: 3        (skip sessions smaller than this)
 - **max_session_events**: 300      (cap the log the LLM reads)
 - **prefer_diversity**: true       (do not cluster all cards on one tool)
@@ -23,11 +26,38 @@ ends.
 
 ---
 
+## Card test — apply BEFORE anything below
+
+Before extracting ANY card, run this two-question gate. The candidate must
+pass at least ONE test. If it passes neither, skip it — even if it looks
+interesting in isolation.
+
+1. **Reuse test** — Will the user (or another engineer working in the same
+   stack) plausibly *do this again* in the next 6 months? If the technique,
+   command, or pattern has zero reuse value beyond this one session, skip.
+   _Pass:_ a `jq --argjson` invocation, a kubectl recovery procedure, a
+   debugging sequence that will repeat.
+   _Fail:_ a one-off file rename, a typo fix, reading a file to answer a
+   question, a session-specific path lookup.
+
+2. **Worth-knowing test** — Even if the user never reuses it directly, does
+   knowing this fact make them measurably better at their craft? Mechanism
+   knowledge, surprising system behavior, or reversed assumptions qualify.
+   _Pass:_ "FluxCD's retry counter only resets on suspend/resume", "Playwright
+   forces one DPR per context", "macOS sandboxed ports show as `ultraseek-http`
+   in lsof".
+   _Fail:_ "ls lists files", "the README has a section about install", trivia
+   that any engineer in the field already knows.
+
+If a candidate fails BOTH tests, do not card it. When in doubt, skip — the
+deck loses value fast when filled with marginal cards.
+
+---
+
 ## What to extract (priority order)
 
-Generate cards ONLY when the session contains something genuinely teachable.
-The bar: would a smart engineer revisit this card in six months and learn
-something? If no, skip.
+After the Card test passes, prioritize in this order. The bar: would a smart
+engineer revisit this card in six months and still learn something?
 
 1. **Non-obvious CLI invocations** — commands with unusual flags, pipelines,
    sub-shells, or chained tools that produced a concrete result.
