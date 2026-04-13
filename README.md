@@ -23,7 +23,7 @@ Everything runs locally. Your sessions never leave your machine.
 Inside a Claude Code session:
 
 ```
-/plugin marketplace add github:pathakcodes/learnFromClaude
+/plugin marketplace add pathakcodes/learnFromClaude
 /plugin install learn-from-claude@learnFromClaude
 ```
 
