@@ -2,9 +2,27 @@
 
 > Turn every Claude Code session into a stack of learning cards you can revisit.
 
+![learnFromClaude dashboard](docs/screenshots/01-main.png)
+
 A Claude Code plugin that passively captures your tool use during a session, asks Claude to extract 3–5 genuinely teachable moments at session end, and surfaces them in a local dashboard with tags, a daily timeline, search, likes, and one-click session resume.
 
 You use Claude Code. Claude Code teaches you back.
+
+## Demo
+
+![walkthrough](docs/video/walkthrough.gif)
+
+[Watch as MP4 (740 KB)](docs/video/walkthrough.mp4)
+
+## Screenshots
+
+| Filter by tag | Live search |
+|---|---|
+| ![tag filter](docs/screenshots/02-tag-filter.png) | ![search](docs/screenshots/03-search.png) |
+
+| Like a card | Edit extraction config |
+|---|---|
+| ![liked](docs/screenshots/04-liked.png) | ![settings](docs/screenshots/05-settings.png) |
 
 ---
 
